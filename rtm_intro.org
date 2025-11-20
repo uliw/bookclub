@@ -19,6 +19,7 @@ You need to do this once per session
 ** Import the model and the plotting interface 
 #+BEGIN_SRC jupyter-python
 import matplotlib.pyplot as plt
+import pandas as pd
 from diff_lib import data_container 
 from run_methane import model
 #+END_SRC
