@@ -72,7 +72,7 @@ def diagenetic_reactions(a, z, c, k, f):
 ** Run the model and plot the results  
 We call  the model code with our parameter list =p=, the boundary conditions =bc=, the reaction rates =k= and our function that describes the diagenetic reactions. The model than returns a dataframe with all the results. 
 #+BEGIN_SRC jupyter-python
-df = main(p, bc, k, diagenetic_reactions)
+df = model(p, bc, k, diagenetic_reactions)
 display(df.head())
   #+END_SRC
 
@@ -87,3 +87,5 @@ fig.tight_layout()
 plt.show()
 #+END_SRC
 
+** Now what does this all mean?
+On first sight, the results seems trivial, however, there some dragon here.
