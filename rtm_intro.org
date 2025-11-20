@@ -1,0 +1,89 @@
+#+TITLE: Reaction Diffusion Models 
+#+AUTHOR:Ulrich G. Wortmann
+#+STARTUP: showall latexpreview shrink inlineimages
+#+OPTIONS: todo:nil tasks:nil tags:nil toc:nil
+#+LATEX_CLASS: koma-article
+#+latex_class_options: [11pt,letter]
+#+latex_header: \newlength\bibitemsep
+#+latex_header: \hypersetup{colorlinks=true,linkcolor=Navy,filecolor=Navy,urlcolor=Navy,citecolor=Navy,anchorcolor=Navy}
+
+\maketitle
+
+* Preparing your session 
+** Installing the python modules needed in this session 
+You need to do this once per session 
+#+BEGIN_SRC jupyter-python
+%pip install fastfd
+#+END_SRC
+
+** Import the model and the plotting interface 
+#+BEGIN_SRC jupyter-python
+import matplotlib.pyplot as plt
+from diff_lib import data_container 
+from run_methane import model
+#+END_SRC
+
+* Defining the first model 
+Model base units are in meter and seconds. Concentrations are in mmol/l. 
+#+BEGIN_SRC jupyter-python
+# a few parameters to play with
+p = {
+    "max_depth": 0.35,  # meters
+    "grid_points": 300,
+    "phi": 0.65,  # porosity
+    "w": 1.5e-10,  # sedimentation rate in m/s
+     
+}
+#+END_SRC
+
+** Set boundary conditions 
+#+BEGIN_SRC jupyter-python
+bc = {
+    "ch4": [  # species
+        "concentration",  # upper bc type
+        0,  # upper bc value
+        "concentration",  # lower bc type
+        0.3,  # lower bc value
+        "dissolved",  # phase
+        1,  # reaction type 1 = source, -1 = sink
+    ],
+}
+#+END_SRC
+
+** Define reaction rates and a reaction term
+For this first run, we set all reaction terms to zero. Even so we only consider a single species, the model code requires that we set a reaction constant for each species.
+#+BEGIN_SRC jupyter-python
+# --------------------------- Reaction constants ------------ *
+k = data_container({"ch4": 0})
+#+END_SRC
+
+Furthermore, we need to provide a function that describes who reacts with whom and how. In this case, this function simply returns zero.
+#+BEGIN_SRC jupyter-python
+def diagenetic_reactions(a, z, c, k, f):
+        """Define microbial reactions. Note that reactions
+        are always positive. The sign is set by reaction type
+        which can be either a 'source' or a 'sink'
+        """
+        f.ch4 = 0
+        
+        return f, 0
+#+END_SRC
+
+** Run the model and plot the results  
+We call  the model code with our parameter list =p=, the boundary conditions =bc=, the reaction rates =k= and our function that describes the diagenetic reactions. The model than returns a dataframe with all the results. 
+#+BEGIN_SRC jupyter-python
+df = main(p, bc, k, diagenetic_reactions)
+display(df.head())
+  #+END_SRC
+
+** Plot the results 
+#+BEGIN_SRC jupyter-python
+fig, ax = plt.subplots() # Create a new plot object 
+ax.plot(df.c_ch4, df.z) # assign data to X & Y axes 
+ax.set_xlabel(r"CH$_4$ [mmol/l]") # set labels 
+ax.set_ylabel("Depth [mbsf]")
+ax.invert_yaxis() 
+fig.tight_layout()
+plt.show()
+#+END_SRC
+
