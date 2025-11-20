@@ -24,13 +24,13 @@ from diff_lib import data_container
 from run_methane import model
 #+END_SRC
 
-* Defining the first model 
+* Defining the first model: 
 Model base units are in meter and seconds. Concentrations are in mmol/l. 
 #+BEGIN_SRC jupyter-python
 # a few parameters to play with
 p = {
     "max_depth": 0.35,  # meters
-    "grid_points": 300,
+    "grid_points": 350,
     "phi": 0.65,  # porosity
     "w": 1.5e-10,  # sedimentation rate in m/s
      
@@ -38,6 +38,7 @@ p = {
 #+END_SRC
 
 ** Set boundary conditions 
+Setting the boundary conditions requires that we make a choice of how to specify the boundary, and then set useful values. Here we specify that we will use the concentration values as a boundary condition for our model. 
 #+BEGIN_SRC jupyter-python
 bc = {
     "ch4": [  # species
@@ -77,7 +78,7 @@ df = model(p, bc, k, diagenetic_reactions)
 display(df.head())
   #+END_SRC
 
-** Plot the results 
+this code will create a plot 
 #+BEGIN_SRC jupyter-python
 fig, ax = plt.subplots() # Create a new plot object 
 ax.plot(df.c_ch4, df.z) # assign data to X & Y axes 
@@ -89,4 +90,116 @@ plt.show()
 #+END_SRC
 
 ** Now what does this all mean?
-On first sight, the results seems trivial, however, there some dragon here.
+At first sight the results appear trivial, but there are hidden difficulties. By imposing a concentration boundary condition (/Dirichlet/ type) we explicitly assume that both the upper and lower boundaries are infinite; that is, the boundary values remain fixed regardless of what happens inside the model. This assumption is often reasonable for the upper boundary, but it is much harder to justify for the lower boundary. In the present example we are effectively stating that there is an infinite supply of methane at the base of the core, which is unlikely to be realistic.
+
+We could try to resort to a so called /Neuman/ boundary condition where, instead of  concentration, we state that there should be no change in concentration, i.e., the gradient of the concentration equals zero. This way we assume that there are no further changes in [CH_{4}] but now, because there is no methane source, we get no methane at all. 
+#+BEGIN_SRC jupyter-python
+bc = {
+    "ch4": [  # species
+        "concentration",  # upper bc type
+        0,  # upper bc value
+        "gradient",  # lower bc type
+        0,  # lower bc value
+        "dissolved",  # phase
+        -1,  # reaction type -1 = source, 1 = sink
+    ],
+}
+
+df = model(p, bc, k, diagenetic_reactions)
+fig, ax = plt.subplots() # Create a new plot object 
+ax.plot(df.c_ch4, df.z) # assign data to X & Y axes 
+ax.set_xlabel(r"CH$_4$ [mmol/l]") # set labels 
+ax.set_ylabel("Depth [mbsf]")
+ax.invert_yaxis() 
+fig.tight_layout()
+plt.show()
+#+END_SRC
+
+* Adding a production term 
+** Constant production throughout 
+Here we need to redefine the reaction term to include a constant methane production.
+#+BEGIN_SRC jupyter-python
+def diagenetic_reactions(a, z, c, k, f):
+      # Angel et al use 200 mol/m^3/day
+      f.ch4 = 1e-8  #mmol/l/s
+      return f, 0
+
+df = model(p, bc, k, diagenetic_reactions)
+fig, ax = plt.subplots() # Create a new plot object 
+ax.plot(df.c_ch4, df.z) # assign data to X & Y axes 
+ax.set_xlabel(r"CH$_4$ [mmol/l]") # set labels 
+ax.set_ylabel("Depth [mbsf]")
+ax.invert_yaxis() 
+fig.tight_layout()
+plt.show()
+#+END_SRC
+This now looks much better, but there are two issues here:
+ A. the curve bends much earlier than in the Angel et al. paper (something we try to fix by changing the methane production term)
+ B. Our curve is artificially forced to be vertical. This is in clear violation of the fact that we produce methane at the bottom of the model.
+ 
+ Further Angel at al, show rates up to 200 mol/m^3/day which is equivalent to 200 mmol/l/day and one day has 8,6400 seconds, so 2.31 mmol/l/second. 
+about 5 orders of magnitude faster than what we assume here, which is an insanely high production rate. Worthwhile to check my conversion, a well as their supplementary materials. 
+ 
+* A better model
+To avoid the bias introduced by our boundary conditions, we need to extend the modeling domain into a region where we are certain that no methane production occurs, so that the assumption of a zero gradient in [CH_{4}] is justified. Therefore, we assume that methane production ceases in the last 5 cm above the bottom of the core.
+#+BEGIN_SRC jupyter-python
+def diagenetic_reactions(a, z, c, k, f):
+      f.ch4[:] = 1e-8  #mmol/s # treat is a vector
+      # f.ch4[:] = 2e-3  #mmol/s # treat is a vector
+      f.ch4[300:] = 0 # set the last 5 cms to zero
+      return f, 0
+
+df = model(p, bc, k, diagenetic_reactions)
+fig, ax = plt.subplots() # Create a new plot object
+ax.plot(df.c_ch4, df.z) # assign data to X & Y axes
+ax.set_xlabel(r"CH$_4$ [mmol/l]") # set labels
+ax.set_ylabel("Depth [mbsf]")
+ax.invert_yaxis()
+# plot f
+axt = ax.twiny()
+axt.plot(df.f_ch4, df.z, color="C1")
+axt.set_xlabel("f [mmol/s]")
+fig.tight_layout()
+plt.show()
+#+END_SRC
+* The problem with advection
+Advection comes in two flavors:
+A. Downward directed sedimentation creates a constant downward flux of particles and dissolved ions. 
+B. Upward directed fluid flow. This only affects solutes, but not particles.
+
+This model has presently no support for the second type, but since we have no particles in our model, we can simply change the sign of the sedimentation rate.
+
+** Case A: Sedimentation rate is fast compared to the microbial  reactions.
+This is an unrealistic scenario but serves to show how sedimentation rate affects concentration profiles
+#+BEGIN_SRC jupyter-python
+# a few parameters to play with
+p = {
+       "w": 1.5e-9,  # sedimentation rate in m/s
+}
+df = model(p, bc, k, diagenetic_reactions)
+fig, ax = plt.subplots() # Create a new plot object
+ax.plot(df.c_ch4, df.z) # assign data to X & Y axes
+ax.set_xlabel(r"CH$_4$ [mmol/l]") # set labels
+ax.set_ylabel("Depth [mbsf]")
+ax.invert_yaxis()
+fig.tight_layout()
+plt.show()
+#+END_SRC
+
+** Case B: Upward directed fluid flow
+To emulate the effect of upward directed fluid flow, we simply change the sign for the sedimentation rate (this is only valid if there are no solids in the model!)
+#+BEGIN_SRC jupyter-python
+# a few parameters to play with
+p = {
+       "w": -1.5e-9,  # sedimentation rate in m/s
+}
+df = model(p, bc, k, diagenetic_reactions)
+fig, ax = plt.subplots() # Create a new plot object
+ax.plot(df.c_ch4, df.z) # assign data to X & Y axes
+ax.set_xlabel(r"CH$_4$ [mmol/l]") # set labels
+ax.set_ylabel("Depth [mbsf]")
+ax.invert_yaxis()
+fig.tight_layout()
+plt.show()
+#+END_SRC
+It is evident, that sedimentation/advection has a huge influence on concentration profiles. A specific problems for wetlands that exposed to episodic flooding, or tidal cycles.
