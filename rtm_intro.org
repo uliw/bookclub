@@ -2,74 +2,62 @@
 #+AUTHOR:Ulrich G. Wortmann
 #+STARTUP: showall latexpreview shrink inlineimages
 #+OPTIONS: todo:nil tasks:nil tags:nil toc:nil
+#+org-latex-compiler: xelatex
 #+LATEX_CLASS: koma-article
 #+latex_class_options: [11pt,letter]
 #+latex_header: \newlength\bibitemsep
 #+latex_header: \hypersetup{colorlinks=true,linkcolor=Navy,filecolor=Navy,urlcolor=Navy,citecolor=Navy,anchorcolor=Navy}
 
-\maketitle
+#+latex: \maketitle
 
 * A short Jupyter Notebook Introduction 
 A notebook is a web‑based document that mixes *code*, *text*, *plots*, and *data*. The building blocks are *cells*. Below is a quick guide to creating, editing, and running code cells.
 
----
 
 ** The Notebook Interface
-| Area | What it does |
-|------|--------------|
-| *Toolbar* | Buttons for saving, adding cells, cutting/pasting, etc. |
-| *Menu bar* | More commands (File → Download, Cell → Run…, etc.) |
-| *Cells* | Individual blocks that hold code or markdown text. |
-| *Kernel* | The Python (or other language) process that executes your code. |
 
----
+- Toolbar ::  Buttons for saving, adding cells, cutting/pasting, etc.  
+- Menu bar :: More commands (File → Download, Cell → Run…, etc.)
+-  Cells :: Individual blocks that hold code or markdown text.  
+- Kernel :: The Python (or other language) process that executes your code.
 
 ** Adding a Code Cell
 1. *Click* the *=+=* button on the toolbar *or* press *=Esc=* then *=B=* (below) / *=A=* (above) to insert a new cell.  
 2. By default the new cell is a *code cell* (green border).  
 
----
 
 **  Editing a Code Cell
 - *Enter edit mode* – click inside the cell *or* press *=Enter=* when the cell is selected.  
 - The cell border turns *green* and you can type Python (or the kernel’s language).  
 - Use normal editor shortcuts (Ctrl‑A to select all, Ctrl‑Z to undo, etc.).  
 
----
 
 **  Running a Code Cell
-| Action | Shortcut | What happens |
-|--------|----------|--------------|
-| Run the current cell and move to the next | *Shift + Enter* | Executes the cell, shows output below, and selects the cell below (or creates a new one if you’re at the end). |
-| Run the current cell and stay | *Ctrl + Enter* | Executes the cell but keeps the cursor in the same cell. |
-| Run the current cell and insert a new one below | *Alt + Enter* | Executes, then adds a fresh cell underneath. |
+- | Run the current cell and move to the next  *Shift + Enter*  Executes the cell, shows output below, and selects the cell below (or creates a new one if you’re at the end).
+- Run the current cell and stay  *Ctrl + Enter*  Executes the cell but keeps the cursor in the same cell.
+- Run the current cell and insert a new one below  *Alt + Enter* Executes, then adds a fresh cell underneath. 
 
 /When you run a cell, the kernel prints the result (e.g., numbers, plots, tables) right under the cell. If there’s an error, the traceback appears there too./
 
----
-
 **  Common Editing Shortcuts (while in *command mode*, =Esc=)
 
-| Keys | Action |
-|------|--------|
-| =A= | Insert a new cell *above* the selected cell |
-| =B= | Insert a new cell *below* |
-| =D= =D= (press =D= twice) | Delete the selected cell |
-| =M= | Change selected cell to *Markdown* (for formatted text) |
-| =Y= | Change selected cell back to *Code* |
-| =↑= / =↓= | Move selection up/down |
-| =Shift= =↑= =↓= | Extend selection to multiple cells |
-| =Ctrl= =S= | Save notebook (also click the floppy‑disk icon) |
+- =A= :: Insert a new cell *above* the selected cell
+- =B= :: Insert a new cell *below* 
+- =D= =D= (press =D= twice) :: Delete the selected cell
+- =M= :: Change selected cell to *Markdown* (for formatted text)
+- =Y= ::  Change selected cell back to *Code*
+- =↑= / =↓= ::  Move selection up/down
+- =Shift= =↑= =↓= Extend selection to multiple cells
+- =Ctrl= =S=  :: Save notebook (also click the floppy‑disk icon) 
 
 /Tip:/ Press =Esc= to ensure you’re in *command mode* (blue border) before using these shortcuts.
 
----
+
 
 ** Saving & Exporting
 - Click the *disk* icon or press *Ctrl + S* frequently.  
 - When finished, you can download the notebook as =.ipynb= (File → Download as → Notebook) or as a static HTML/PDF for sharing.
 
----
 
 ** Quick Checklist for First‑Time Users
 1. *Add* a code cell (=+= or =B=).  
