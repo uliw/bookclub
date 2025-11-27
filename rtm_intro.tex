@@ -1,0 +1,405 @@
+% Created 2025-11-27 Thu 10:47
+% Intended LaTeX compiler: pdflatex
+\documentclass[11pt,letter]{scrartcl}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern}
+\usepackage{soul}
+\usepackage[T1]{fontenc}
+\usepackage{graphicx}
+\usepackage[svgnames]{xcolor}
+\usepackage{float}
+\usepackage{wrapfig}
+\usepackage{rotating}
+\usepackage[normalem]{ulem}
+\usepackage{amsmath}
+\usepackage{textcomp}
+\usepackage{natbib}
+\usepackage{natmove}
+\usepackage{marvosym}
+\usepackage{wasysym}
+\usepackage{amssymb}
+\usepackage{amsmath}
+\usepackage{booktabs}
+\usepackage[theorems, skins]{tcolorbox}
+\usepackage[version=4]{mhchem}
+\usepackage{url}
+\usepackage{array}
+\usepackage[cache=false]{minted}
+\usepackage[strings]{underscore}
+\usepackage{hyperref}
+\newlength\bibitemsep
+\hypersetup{colorlinks=true,linkcolor=Navy,filecolor=Navy,urlcolor=Navy,citecolor=Navy,anchorcolor=Navy}
+\author{Ulrich G. Wortmann}
+\date{\today}
+\title{Reaction Diffusion Models - A Practical Introduction}
+\begin{document}
+
+\maketitle
+\section{A short Jupyter Notebook Introduction}
+\label{sec:orgbb8919c}
+A notebook is a web‑based document that mixes \textbf{code}, \textbf{text}, \textbf{plots}, and \textbf{data}. The building blocks are \textbf{cells}. Below is a quick guide to creating, editing, and running code cells.
+
+---
+\subsection{The Notebook Interface}
+\label{sec:org476f586}
+\begin{center}
+\begin{tabular}{ll}
+Area & What it does\\
+\hline
+\textbf{Toolbar} & Buttons for saving, adding cells, cutting/pasting, etc.\\
+\textbf{Menu bar} & More commands (File → Download, Cell → Run…, etc.)\\
+\textbf{Cells} & Individual blocks that hold code or markdown text.\\
+\textbf{Kernel} & The Python (or other language) process that executes your code.\\
+\end{tabular}
+
+\end{center}
+
+---
+\subsection{Adding a Code Cell}
+\label{sec:org78449f7}
+\begin{enumerate}
+\item \textbf{Click} the \textbf{\texttt{+}} button on the toolbar \textbf{or} press \textbf{\texttt{Esc}} then \textbf{\texttt{B}} (below) / \textbf{\texttt{A}} (above) to insert a new cell.
+\item By default the new cell is a \textbf{code cell} (green border).
+\end{enumerate}
+
+---
+\subsection{Editing a Code Cell}
+\label{sec:org1b3beb4}
+\begin{itemize}
+\item \textbf{Enter edit mode} – click inside the cell \textbf{or} press \textbf{\texttt{Enter}} when the cell is selected.
+\item The cell border turns \textbf{green} and you can type Python (or the kernel’s language).
+\item Use normal editor shortcuts (Ctrl‑A to select all, Ctrl‑Z to undo, etc.).
+\end{itemize}
+
+---
+\subsection{Running a Code Cell}
+\label{sec:orgeaaabf6}
+\begin{center}
+\begin{tabular}{lll}
+Action & Shortcut & What happens\\
+\hline
+Run the current cell and move to the next & \textbf{Shift + Enter} & Executes the cell, shows output below, and selects the cell below (or creates a new one if you’re at the end).\\
+Run the current cell and stay & \textbf{Ctrl + Enter} & Executes the cell but keeps the cursor in the same cell.\\
+Run the current cell and insert a new one below & \textbf{Alt + Enter} & Executes, then adds a fresh cell underneath.\\
+\end{tabular}
+
+\end{center}
+
+\emph{When you run a cell, the kernel prints the result (e.g., numbers, plots, tables) right under the cell. If there’s an error, the traceback appears there too.}
+
+---
+\subsection{Common Editing Shortcuts (while in \textbf{command mode}, \texttt{Esc})}
+\label{sec:org00129ff}
+
+\begin{center}
+\begin{tabular}{ll}
+Keys & Action\\
+\hline
+\texttt{A} & Insert a new cell \textbf{above} the selected cell\\
+\texttt{B} & Insert a new cell \textbf{below}\\
+\texttt{D} \texttt{D} (press \texttt{D} twice) & Delete the selected cell\\
+\texttt{M} & Change selected cell to \textbf{Markdown} (for formatted text)\\
+\texttt{Y} & Change selected cell back to \textbf{Code}\\
+\texttt{↑} / \texttt{↓} & Move selection up/down\\
+\texttt{Shift} \texttt{↑} \texttt{↓} & Extend selection to multiple cells\\
+\texttt{Ctrl} \texttt{S} & Save notebook (also click the floppy‑disk icon)\\
+\end{tabular}
+
+\end{center}
+
+\emph{Tip:} Press \texttt{Esc} to ensure you’re in \textbf{command mode} (blue border) before using these shortcuts.
+
+---
+\subsection{Saving \& Exporting}
+\label{sec:orgb188a96}
+\begin{itemize}
+\item Click the \textbf{disk} icon or press \textbf{Ctrl + S} frequently.
+\item When finished, you can download the notebook as \texttt{.ipynb} (File → Download as → Notebook) or as a static HTML/PDF for sharing.
+\end{itemize}
+
+---
+\subsection{Quick Checklist for First‑Time Users}
+\label{sec:org580f4cd}
+\begin{enumerate}
+\item \textbf{Add} a code cell (\texttt{+} or \texttt{B}).
+\item \textbf{Type} some Python, e.g. \texttt{print("Hello, Jupyter!")}.
+\item \textbf{Run} it with \textbf{Shift + Enter}.
+\item \textbf{Observe} the output below.
+\item \textbf{Edit} any cell by clicking into it and pressing \textbf{Enter}.
+\item \textbf{Save} often (\texttt{Ctrl + S}).
+\end{enumerate}
+
+That’s it! With these basics you can start experimenting, visualizing data, and building interactive analyses—all within the same notebook. Happy coding!
+
+See this link \url{https://www.youtube.com/watch?v=H9Iu49E6Mxs} for a more complete intro.
+\subsection{Checkpoints}
+\label{sec:org8f67575}
+Checkpoints allow you to return to a previous version of your notebook. 
+\begin{itemize}
+\item \textbf{Manually creating a checkpoint}  
+\begin{enumerate}
+\item Click \textbf{File → Save and Checkpoint} (or press \texttt{Ctrl + S}).
+\item The current notebook becomes the new checkpoint.
+\end{enumerate}
+
+\item \textbf{Reverting to a checkpoint}  
+\begin{enumerate}
+\item Choose \textbf{File → Revert to Checkpoint → <timestamp>}.
+\item Jupyter overwrites the notebook with the saved copy.
+\item The notebook shows a banner “Reverted to checkpoint”.
+\end{enumerate}
+\end{itemize}
+
+It is a good idea to frequently press \texttt{Ctrl +S}!
+\subsubsection{Try me!}
+\label{sec:orge501467}
+\begin{itemize}
+\item Create a new checkpoint
+\item Create a new code cell, and type a something like \texttt{12 *5}
+\item execute the code cell to see the result.
+\item revert to the previous checkpoint
+\end{itemize}
+\section{Preparing your python session}
+\label{sec:org40aeeff}
+Before we begin, we need to install some python modules. 
+\subsection{Installing the python modules needed in this session}
+\label{sec:org62e5f00}
+You need to execute this once per session 
+\begin{minted}[fontsize=\small,frame=lines,linenos]{python}
+%pip install fastfd
+\end{minted}
+\subsection{Import the model and the plotting interface}
+\label{sec:org98cbb6e}
+We now load the following modules:
+
+\begin{center}
+\begin{tabular}{ll}
+Module & Purpose\\
+\hline
+\texttt{matplotlib.pyplot} & Create static, animated, and interactive figures.\\
+\texttt{pandas} & Manipulate tabular data (DataFrames).\\
+\texttt{diff\_lib.data\_container} & Wrap raw simulation output into a convenient object.\\
+\texttt{run\_methane.model} & Run the methane diffusion model.\\
+\end{tabular}
+
+\end{center}
+
+\begin{minted}[fontsize=\small,frame=lines,linenos]{python}
+import matplotlib.pyplot as plt
+import pandas as pd
+from diff_lib import data_container 
+from run_methane import model
+\end{minted}
+\section{Defining the first model:}
+\label{sec:orga1a2f26}
+The model we employ is derived from a more comprehensive reaction-transport model used in my research. It is not designed for a Jupyter session, so the user interface is somewhat awkward. Most parameters are defined using Python dictionaries that contain key-value pairs. The key is enclosed in quotation marks; the value may be (i) a bare word, interpreted as the name of a variable, (ii) a quoted string, interpreted verbatim, or (iii) a numeric value.
+
+A common source of error in modeling is inconsistent units. Therefore I run all my models in SI base units - meters, seconds, and concentrations expressed in mmol/l. First we have to define a the length of the model, the number of grid points, the porosity, and sedimentation rate. Before continuing, convert the sedimentation value into meters/ky to see if the value make sense:
+
+You can do this easily on a pocket calculator, or by typing the calculation in this notebook cell (see above on how to edit, and execute a cell): Note that \texttt{1e-5} stands for 1 \texttimes{} 10\textsuperscript{-5}.
+\begin{minted}[fontsize=\small,frame=lines,linenos]{python}
+12 *5
+\end{minted}
+
+Next we need to execute this code block to activate these numbers. You can always come back later to to change them (Note, changes affect the entire notebook!).
+\begin{minted}[fontsize=\small,frame=lines,linenos]{python}
+# a few parameters to play with
+p = {
+    "max_depth": 0.35,  # meters
+    "grid_points": 350,
+    "phi": 0.65,  # porosity
+    "w": 1.5e-10,  # sedimentation rate in m/s
+}
+\end{minted}
+\subsection{Setting boundary conditions}
+\label{sec:org4e86f26}
+Setting the boundary conditions requires choosing a specification method and assigning appropriate values. For diffusive and advective transport we can use three types of boundary conditions:
+
+\begin{enumerate}
+\item \textbf{Dirichlet} (infinite concentration) – the concentration at the boundary is fixed. For example, the sulfate concentration in seawater remains \(28\ \mathrm{mmol\;L^{-1}}\) regardless of reactions in the underlying sediment.
+\item \textbf{Neumann} – the concentration is unknown but its gradient is zero. This represents a depth where diagenetic reactions have ceased.
+\item \textbf{Robin} – a mixture of Dirichlet and Neumann. The flux is proportional to the difference between the boundary value and the ambient value.
+\end{enumerate}
+
+We will use the following concentration values as upper and lower bounds for our first model.
+\begin{minted}[fontsize=\small,frame=lines,linenos]{python}
+bc = {
+    "ch4": [  # species
+        "concentration",  # upper bc type
+        0,  # upper bc value
+        "concentration",  # lower bc type
+        0.3,  # lower bc value
+        "dissolved",  # phase
+        1,  # reaction type 1 = source, -1 = sink
+    ],
+}
+\end{minted}
+\subsection{Define reaction rates and a reaction term}
+\label{sec:orgc1c3472}
+For the initial run we use a simple model with no microbial reactions; all reaction terms are set to zero. Although we consider only one species, the code requires a reaction constant for every species.
+\begin{minted}[fontsize=\small,frame=lines,linenos]{python}
+# --------------------------- Reaction constants ------------ *
+k = data_container({"ch4": 0})
+\end{minted}
+
+Furthermore, I provide a function that describes which entities react with which and how. Because there is no reaction, the function returns 0.
+\begin{minted}[fontsize=\small,frame=lines,linenos]{python}
+def diagenetic_reactions(a, z, c, k, f):
+        """Define microbial reactions. Note that reactions
+        are always positive. The sign is set by reaction type
+        which can be either a 'source' or a 'sink'
+        """
+        f.ch4 = 0
+
+        return f, 0
+\end{minted}
+\subsection{Run the model and plot the results}
+\label{sec:org15d7948}
+Now I am ready to run the model. I call the model code with the parameter list \texttt{p}, the boundary conditions \texttt{bc}, the reaction rates \texttt{k}, and the function that describes the diagenetic reactions. The model returns a data frame \texttt{df} with all results.
+\begin{minted}[fontsize=\small,frame=lines,linenos]{python}
+df = model(p, bc, k, diagenetic_reactions)
+display(df.head())
+\end{minted}
+
+Next, I create an X‑Y graph from the dataframe with this code snippet.
+\begin{minted}[fontsize=\small,frame=lines,linenos]{python}
+fig, ax = plt.subplots() # Create a new plot object 
+ax.plot(df.c_ch4, df.z) # assign data to X & Y axes 
+ax.set_xlabel(r"CH$_4$ [mmol/l]") # set labels 
+ax.set_ylabel("Depth [mbsf]")
+ax.invert_yaxis() 
+fig.tight_layout()
+plt.show()
+\end{minted}
+BTW, If you feel adventurous, create a checkpoint and edit the above code by dividing the z-coordinate by 10 (\texttt{df.z/10})m and change the y-label to cm.
+\subsection{Now what does this all mean?}
+\label{sec:org1e12ab7}
+At first sight the results appear trivial, but there are hidden difficulties. By imposing a concentration boundary condition (\emph{Dirichlet} type) we explicitly assume that both the upper and lower boundaries are infinite; that is, the boundary values remain fixed regardless of what happens inside the model. This assumption is often reasonable for the upper boundary, but it is much harder to justify for the lower boundary. In the present example we are effectively stating that there is an infinite supply of methane at the base of the core, which is unlikely to be realistic. And in the absence of any reactions, we get a straight line as we would expect for diffusive mixing.
+
+We could try to resort to a  \emph{Neuman} boundary condition where, instead of  concentration, we state that there should be no change in concentration, i.e., the gradient of the concentration equals zero. This way we assume that there are no further changes in [CH\textsubscript{4}] but now, because there is no methane source below our modeling domain (equally unlikely), and we get no methane at all. 
+\begin{minted}[fontsize=\small,frame=lines,linenos]{python}
+bc = {
+    "ch4": [  # species
+        "concentration",  # upper bc type
+        0,  # upper bc value
+        "gradient",  # lower bc type
+        0,  # lower bc value
+        "dissolved",  # phase
+        -1,  # reaction type -1 = source, 1 = sink
+    ],
+}
+
+df = model(p, bc, k, diagenetic_reactions)
+fig, ax = plt.subplots() # Create a new plot object 
+ax.plot(df.c_ch4, df.z) # assign data to X & Y axes 
+ax.set_xlabel(r"CH$_4$ [mmol/l]") # set labels 
+ax.set_ylabel("Depth [mbsf]")
+ax.invert_yaxis() 
+fig.tight_layout()
+plt.show()
+\end{minted}
+
+So a key observation is that the boundary conditions determine the model results to a large degree. 
+\section{Adding a methane production term}
+\label{sec:orgc37d84f}
+Microbial reactions often decay with time (depth), but for the sake of simplicity, we will assume a constant reaction term. We do this by modifying the \texttt{diagenetic\_reactions} function, and then re-running the model. 
+\begin{minted}[fontsize=\small,frame=lines,linenos]{python}
+def diagenetic_reactions(a, z, c, k, f):
+      f.ch4 = 1e-8  #mmol/l/s
+      return f, 0
+
+df = model(p, bc, k, diagenetic_reactions)
+fig, ax = plt.subplots() # Create a new plot object 
+ax.plot(df.c_ch4, df.z) # assign data to X & Y axes 
+ax.set_xlabel(r"CH$_4$ [mmol/l]") # set labels 
+ax.set_ylabel("Depth [mbsf]")
+ax.invert_yaxis() 
+fig.tight_layout()
+plt.show()
+\end{minted}
+This now looks much better, but there are two issues here:
+\begin{enumerate}
+\item the curve bends much earlier than in the Angel et al. paper (something we can try to fix by changing the methane production term)
+\item Our curve is artificially forced to be vertical. This is in clear violation of the fact that we produce methane at the bottom of the model.
+\end{enumerate}
+
+Now go back to the Angle et al paper, and compare their methane production rate with the above number. You can use this code box for the calculation:
+\begin{minted}[fontsize=\small,frame=lines,linenos]{python}
+12 * 5
+\end{minted}
+\section{A better model}
+\label{sec:org3c19494}
+To avoid the bias introduced by our boundary conditions, we need to extend the modeling domain into a region where we are certain that no methane production occurs, so that the assumption of a zero gradient in [CH\textsubscript{4}] is justified. Therefore, we assume that methane production ceases in the last 5 cm above the bottom of the core.
+\begin{minted}[fontsize=\small,frame=lines,linenos]{python}
+def diagenetic_reactions(a, z, c, k, f):
+      f.ch4[:] = 1e-8  #mmol/s # treat ch4 a vector
+      f.ch4[300:] = 0 # set the last 5 cms to zero
+
+      return f, 0
+
+# run model
+df = model(p, bc, k, diagenetic_reactions)
+
+# plot data
+fig, ax = plt.subplots() # Create a new plot object
+ax.plot(df.c_ch4, df.z) # assign data to X & Y axes
+ax.set_xlabel(r"CH$_4$ [mmol/l]") # set labels
+ax.set_ylabel("Depth [mbsf]")
+ax.invert_yaxis()
+
+# plot f to verify
+axt = ax.twiny()
+axt.plot(df.f_ch4, df.z, color="C1")
+axt.set_xlabel("f [mmol/s]")
+fig.tight_layout()
+plt.show()
+\end{minted}
+\section{The problem with advection}
+\label{sec:orgfb342fc}
+Advection comes in two flavors:
+\begin{enumerate}
+\item Downward directed sedimentation creates a constant downward flux. This affects dissolved ions as well as solids. Fast sedimentation rates are able to distort the linear mixing profiles into a concave shape.
+\item Upward directed fluid flow. This only affects solutes, but not particles.
+\end{enumerate}
+
+This model has presently no support for the second type, but since we have no particles in our model, we can simply change the sign of the sedimentation rate to emulate the effect. 
+\subsection{Case A: Sedimentation rate is fast compared to the microbial  reactions.}
+\label{sec:orgc8321d4}
+This is an unrealistic scenario but serves to show how sedimentation rate affects concentration profiles
+\begin{minted}[fontsize=\small,frame=lines,linenos]{python}
+# a few parameters to play with
+p = {
+       "w": 1.5e-9,  # sedimentation rate in m/s
+}
+
+df = model(p, bc, k, diagenetic_reactions)
+
+fig, ax = plt.subplots() # Create a new plot object
+ax.plot(df.c_ch4, df.z) # assign data to X & Y axes
+ax.set_xlabel(r"CH$_4$ [mmol/l]") # set labels
+ax.set_ylabel("Depth [mbsf]")
+ax.invert_yaxis()
+fig.tight_layout()
+plt.show()
+\end{minted}
+\subsection{Case B: Upward directed fluid flow}
+\label{sec:orgf682575}
+To emulate the effect of upward directed fluid flow, we simply change the sign for the sedimentation rate (this is only valid if there are no solids in the model!)
+\begin{minted}[fontsize=\small,frame=lines,linenos]{python}
+# a few parameters to play with
+p = {
+       "w": -1.5e-9,  # sedimentation rate in m/s
+}
+
+df = model(p, bc, k, diagenetic_reactions)
+
+fig, ax = plt.subplots() # Create a new plot object
+ax.plot(df.c_ch4, df.z) # assign data to X & Y axes
+ax.set_xlabel(r"CH$_4$ [mmol/l]") # set labels
+ax.set_ylabel("Depth [mbsf]")
+ax.invert_yaxis()
+fig.tight_layout()
+plt.show()
+\end{minted}
+It is evident, that sedimentation/advection has a huge influence on concentration profiles. A specific problems for wetlands that are exposed to episodic flooding, or tidal cycles.
+\end{document}

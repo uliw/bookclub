@@ -1,4 +1,4 @@
-#+TITLE: Reaction Diffusion Models 
+#+TITLE: Reaction Diffusion Models - A Practical Introduction
 #+AUTHOR:Ulrich G. Wortmann
 #+STARTUP: showall latexpreview shrink inlineimages
 #+OPTIONS: todo:nil tasks:nil tags:nil toc:nil
@@ -9,14 +9,119 @@
 
 \maketitle
 
-* Preparing your session 
+* A short Jupyter Notebook Introduction 
+A notebook is a web‑based document that mixes *code*, *text*, *plots*, and *data*. The building blocks are *cells*. Below is a quick guide to creating, editing, and running code cells.
+
+---
+
+** The Notebook Interface
+| Area | What it does |
+|------|--------------|
+| *Toolbar* | Buttons for saving, adding cells, cutting/pasting, etc. |
+| *Menu bar* | More commands (File → Download, Cell → Run…, etc.) |
+| *Cells* | Individual blocks that hold code or markdown text. |
+| *Kernel* | The Python (or other language) process that executes your code. |
+
+---
+
+** Adding a Code Cell
+1. *Click* the *=+=* button on the toolbar *or* press *=Esc=* then *=B=* (below) / *=A=* (above) to insert a new cell.  
+2. By default the new cell is a *code cell* (green border).  
+
+---
+
+**  Editing a Code Cell
+- *Enter edit mode* – click inside the cell *or* press *=Enter=* when the cell is selected.  
+- The cell border turns *green* and you can type Python (or the kernel’s language).  
+- Use normal editor shortcuts (Ctrl‑A to select all, Ctrl‑Z to undo, etc.).  
+
+---
+
+**  Running a Code Cell
+| Action | Shortcut | What happens |
+|--------|----------|--------------|
+| Run the current cell and move to the next | *Shift + Enter* | Executes the cell, shows output below, and selects the cell below (or creates a new one if you’re at the end). |
+| Run the current cell and stay | *Ctrl + Enter* | Executes the cell but keeps the cursor in the same cell. |
+| Run the current cell and insert a new one below | *Alt + Enter* | Executes, then adds a fresh cell underneath. |
+
+/When you run a cell, the kernel prints the result (e.g., numbers, plots, tables) right under the cell. If there’s an error, the traceback appears there too./
+
+---
+
+**  Common Editing Shortcuts (while in *command mode*, =Esc=)
+
+| Keys | Action |
+|------|--------|
+| =A= | Insert a new cell *above* the selected cell |
+| =B= | Insert a new cell *below* |
+| =D= =D= (press =D= twice) | Delete the selected cell |
+| =M= | Change selected cell to *Markdown* (for formatted text) |
+| =Y= | Change selected cell back to *Code* |
+| =↑= / =↓= | Move selection up/down |
+| =Shift= =↑= =↓= | Extend selection to multiple cells |
+| =Ctrl= =S= | Save notebook (also click the floppy‑disk icon) |
+
+/Tip:/ Press =Esc= to ensure you’re in *command mode* (blue border) before using these shortcuts.
+
+---
+
+** Saving & Exporting
+- Click the *disk* icon or press *Ctrl + S* frequently.  
+- When finished, you can download the notebook as =.ipynb= (File → Download as → Notebook) or as a static HTML/PDF for sharing.
+
+---
+
+** Quick Checklist for First‑Time Users
+1. *Add* a code cell (=+= or =B=).  
+2. *Type* some Python, e.g. =print("Hello, Jupyter!")=.  
+3. *Run* it with *Shift + Enter*.  
+4. *Observe* the output below.  
+5. *Edit* any cell by clicking into it and pressing *Enter*.  
+6. *Save* often (=Ctrl + S=).  
+
+That’s it! With these basics you can start experimenting, visualizing data, and building interactive analyses—all within the same notebook. Happy coding!
+
+See this link https://www.youtube.com/watch?v=H9Iu49E6Mxs for a more complete intro.
+
+** Checkpoints
+Checkpoints allow you to return to a previous version of your notebook. 
+- *Manually creating a checkpoint*  
+  1. Click *File → Save and Checkpoint* (or press =Ctrl + S=).  
+  2. The current notebook becomes the new checkpoint.
+
+- *Reverting to a checkpoint*  
+  1. Choose *File → Revert to Checkpoint → <timestamp>*.  
+  2. Jupyter overwrites the notebook with the saved copy.  
+  3. The notebook shows a banner “Reverted to checkpoint”.
+
+It is a good idea to frequently press =Ctrl +S=!
+
+*** Try me! 
+- Create a new checkpoint 
+- Create a new code cell, and type a something like =12 *5=
+- execute the code cell to see the result.
+- revert to the previous checkpoint 
+
+
+
+* Preparing your python session 
+Before we begin, we need to install some python modules. 
 ** Installing the python modules needed in this session 
-You need to do this once per session 
+You need to execute this once per session 
 #+BEGIN_SRC jupyter-python
 %pip install fastfd
 #+END_SRC
 
 ** Import the model and the plotting interface 
+We now load the following modules:
+
+| Module | Purpose |
+|--------|---------|
+| =matplotlib.pyplot= | Create static, animated, and interactive figures. |
+| =pandas= | Manipulate tabular data (DataFrames). |
+| =diff_lib.data_container= | Wrap raw simulation output into a convenient object. |
+| =run_methane.model= | Run the methane diffusion model. |
+
 #+BEGIN_SRC jupyter-python
 import matplotlib.pyplot as plt
 import pandas as pd
@@ -24,8 +129,18 @@ from diff_lib import data_container
 from run_methane import model
 #+END_SRC
 
+
 * Defining the first model: 
-Model base units are in meter and seconds. Concentrations are in mmol/l. 
+The model we employ is derived from a more comprehensive reaction-transport model used in my research. It is not designed for a Jupyter session, so the user interface is somewhat awkward. Most parameters are defined using Python dictionaries that contain key-value pairs. The key is enclosed in quotation marks; the value may be (i) a bare word, interpreted as the name of a variable, (ii) a quoted string, interpreted verbatim, or (iii) a numeric value.
+
+A common source of error in modeling is inconsistent units. Therefore I run all my models in SI base units - meters, seconds, and concentrations expressed in mmol/l. First we have to define a the length of the model, the number of grid points, the porosity, and sedimentation rate. Before continuing, convert the sedimentation value into meters/ky to see if the value make sense:
+
+You can do this easily on a pocket calculator, or by typing the calculation in this notebook cell (see above on how to edit, and execute a cell): Note that =1e-5= stands for 1 \times 10^{-5}.
+#+BEGIN_SRC jupyter-python
+12 *5
+#+END_SRC
+
+Next we need to execute this code block to activate these numbers. You can always come back later to to change them (Note, changes affect the entire notebook!).
 #+BEGIN_SRC jupyter-python
 # a few parameters to play with
 p = {
@@ -33,12 +148,17 @@ p = {
     "grid_points": 350,
     "phi": 0.65,  # porosity
     "w": 1.5e-10,  # sedimentation rate in m/s
-     
 }
 #+END_SRC
 
-** Set boundary conditions 
-Setting the boundary conditions requires that we make a choice of how to specify the boundary, and then set useful values. Here we specify that we will use the concentration values as a boundary condition for our model. 
+** Setting boundary conditions 
+Setting the boundary conditions requires choosing a specification method and assigning appropriate values. For diffusive and advective transport we can use three types of boundary conditions:
+
+1. *Dirichlet* (infinite concentration) – the concentration at the boundary is fixed. For example, the sulfate concentration in seawater remains \(28\ \mathrm{mmol\;L^{-1}}\) regardless of reactions in the underlying sediment.  
+2. *Neumann* – the concentration is unknown but its gradient is zero. This represents a depth where diagenetic reactions have ceased.  
+3. *Robin* – a mixture of Dirichlet and Neumann. The flux is proportional to the difference between the boundary value and the ambient value.  
+
+We will use the following concentration values as upper and lower bounds for our first model.
 #+BEGIN_SRC jupyter-python
 bc = {
     "ch4": [  # species
@@ -53,13 +173,13 @@ bc = {
 #+END_SRC
 
 ** Define reaction rates and a reaction term
-For this first run, we set all reaction terms to zero. Even so we only consider a single species, the model code requires that we set a reaction constant for each species.
+For the initial run we use a simple model with no microbial reactions; all reaction terms are set to zero. Although we consider only one species, the code requires a reaction constant for every species.
 #+BEGIN_SRC jupyter-python
 # --------------------------- Reaction constants ------------ *
 k = data_container({"ch4": 0})
 #+END_SRC
 
-Furthermore, we need to provide a function that describes who reacts with whom and how. In this case, this function simply returns zero.
+Furthermore, I provide a function that describes which entities react with which and how. Because there is no reaction, the function returns 0.
 #+BEGIN_SRC jupyter-python
 def diagenetic_reactions(a, z, c, k, f):
         """Define microbial reactions. Note that reactions
@@ -72,13 +192,13 @@ def diagenetic_reactions(a, z, c, k, f):
 #+END_SRC
 
 ** Run the model and plot the results  
-We call  the model code with our parameter list =p=, the boundary conditions =bc=, the reaction rates =k= and our function that describes the diagenetic reactions. The model than returns a dataframe with all the results. 
+Now I am ready to run the model. I call the model code with the parameter list =p=, the boundary conditions =bc=, the reaction rates =k=, and the function that describes the diagenetic reactions. The model returns a data frame =df= with all results.
 #+BEGIN_SRC jupyter-python
 df = model(p, bc, k, diagenetic_reactions)
 display(df.head())
   #+END_SRC
 
-this code will create a plot 
+Next, I create an X‑Y graph from the dataframe with this code snippet.
 #+BEGIN_SRC jupyter-python
 fig, ax = plt.subplots() # Create a new plot object 
 ax.plot(df.c_ch4, df.z) # assign data to X & Y axes 
@@ -88,11 +208,13 @@ ax.invert_yaxis()
 fig.tight_layout()
 plt.show()
 #+END_SRC
+BTW, If you feel adventurous, create a checkpoint and edit the above code by dividing the z-coordinate by 10 (=df.z/10=)m and change the y-label to cm.
+
 
 ** Now what does this all mean?
-At first sight the results appear trivial, but there are hidden difficulties. By imposing a concentration boundary condition (/Dirichlet/ type) we explicitly assume that both the upper and lower boundaries are infinite; that is, the boundary values remain fixed regardless of what happens inside the model. This assumption is often reasonable for the upper boundary, but it is much harder to justify for the lower boundary. In the present example we are effectively stating that there is an infinite supply of methane at the base of the core, which is unlikely to be realistic.
+At first sight the results appear trivial, but there are hidden difficulties. By imposing a concentration boundary condition (/Dirichlet/ type) we explicitly assume that both the upper and lower boundaries are infinite; that is, the boundary values remain fixed regardless of what happens inside the model. This assumption is often reasonable for the upper boundary, but it is much harder to justify for the lower boundary. In the present example we are effectively stating that there is an infinite supply of methane at the base of the core, which is unlikely to be realistic. And in the absence of any reactions, we get a straight line as we would expect for diffusive mixing.
 
-We could try to resort to a so called /Neuman/ boundary condition where, instead of  concentration, we state that there should be no change in concentration, i.e., the gradient of the concentration equals zero. This way we assume that there are no further changes in [CH_{4}] but now, because there is no methane source, we get no methane at all. 
+We could try to resort to a  /Neuman/ boundary condition where, instead of  concentration, we state that there should be no change in concentration, i.e., the gradient of the concentration equals zero. This way we assume that there are no further changes in [CH_{4}] but now, because there is no methane source below our modeling domain (equally unlikely), and we get no methane at all. 
 #+BEGIN_SRC jupyter-python
 bc = {
     "ch4": [  # species
@@ -113,14 +235,14 @@ ax.set_ylabel("Depth [mbsf]")
 ax.invert_yaxis() 
 fig.tight_layout()
 plt.show()
-#+END_SRC
+#+END_SRC 
 
-* Adding a production term 
-** Constant production throughout 
-Here we need to redefine the reaction term to include a constant methane production.
+So a key observation is that the boundary conditions determine the model results to a large degree. 
+
+* Adding a methane production term 
+Microbial reactions often decay with time (depth), but for the sake of simplicity, we will assume a constant reaction term. We do this by modifying the =diagenetic_reactions= function, and then re-running the model. 
 #+BEGIN_SRC jupyter-python
 def diagenetic_reactions(a, z, c, k, f):
-      # Angel et al use 200 mol/m^3/day
       f.ch4 = 1e-8  #mmol/l/s
       return f, 0
 
@@ -134,28 +256,35 @@ fig.tight_layout()
 plt.show()
 #+END_SRC
 This now looks much better, but there are two issues here:
- A. the curve bends much earlier than in the Angel et al. paper (something we try to fix by changing the methane production term)
+ A. the curve bends much earlier than in the Angel et al. paper (something we can try to fix by changing the methane production term)
  B. Our curve is artificially forced to be vertical. This is in clear violation of the fact that we produce methane at the bottom of the model.
  
- Further Angel at al, show rates up to 200 mol/m^3/day which is equivalent to 200 mmol/l/day and one day has 8,6400 seconds, so 2.31 mmol/l/second. 
-about 5 orders of magnitude faster than what we assume here, which is an insanely high production rate. Worthwhile to check my conversion, a well as their supplementary materials. 
+Now go back to the Angle et al paper, and compare their methane production rate with the above number. You can use this code box for the calculation:
+#+BEGIN_SRC jupyter-python
+12 * 5
+#+END_SRC
+
  
 * A better model
 To avoid the bias introduced by our boundary conditions, we need to extend the modeling domain into a region where we are certain that no methane production occurs, so that the assumption of a zero gradient in [CH_{4}] is justified. Therefore, we assume that methane production ceases in the last 5 cm above the bottom of the core.
 #+BEGIN_SRC jupyter-python
 def diagenetic_reactions(a, z, c, k, f):
-      f.ch4[:] = 1e-8  #mmol/s # treat is a vector
-      # f.ch4[:] = 2e-3  #mmol/s # treat is a vector
+      f.ch4[:] = 1e-8  #mmol/s # treat ch4 a vector
       f.ch4[300:] = 0 # set the last 5 cms to zero
+
       return f, 0
 
+# run model
 df = model(p, bc, k, diagenetic_reactions)
+
+# plot data
 fig, ax = plt.subplots() # Create a new plot object
 ax.plot(df.c_ch4, df.z) # assign data to X & Y axes
 ax.set_xlabel(r"CH$_4$ [mmol/l]") # set labels
 ax.set_ylabel("Depth [mbsf]")
 ax.invert_yaxis()
-# plot f
+
+# plot f to verify
 axt = ax.twiny()
 axt.plot(df.f_ch4, df.z, color="C1")
 axt.set_xlabel("f [mmol/s]")
@@ -164,10 +293,10 @@ plt.show()
 #+END_SRC
 * The problem with advection
 Advection comes in two flavors:
-A. Downward directed sedimentation creates a constant downward flux of particles and dissolved ions. 
+A. Downward directed sedimentation creates a constant downward flux. This affects dissolved ions as well as solids. Fast sedimentation rates are able to distort the linear mixing profiles into a concave shape. 
 B. Upward directed fluid flow. This only affects solutes, but not particles.
 
-This model has presently no support for the second type, but since we have no particles in our model, we can simply change the sign of the sedimentation rate.
+This model has presently no support for the second type, but since we have no particles in our model, we can simply change the sign of the sedimentation rate to emulate the effect. 
 
 ** Case A: Sedimentation rate is fast compared to the microbial  reactions.
 This is an unrealistic scenario but serves to show how sedimentation rate affects concentration profiles
@@ -176,7 +305,9 @@ This is an unrealistic scenario but serves to show how sedimentation rate affect
 p = {
        "w": 1.5e-9,  # sedimentation rate in m/s
 }
+
 df = model(p, bc, k, diagenetic_reactions)
+
 fig, ax = plt.subplots() # Create a new plot object
 ax.plot(df.c_ch4, df.z) # assign data to X & Y axes
 ax.set_xlabel(r"CH$_4$ [mmol/l]") # set labels
@@ -193,7 +324,9 @@ To emulate the effect of upward directed fluid flow, we simply change the sign f
 p = {
        "w": -1.5e-9,  # sedimentation rate in m/s
 }
+
 df = model(p, bc, k, diagenetic_reactions)
+
 fig, ax = plt.subplots() # Create a new plot object
 ax.plot(df.c_ch4, df.z) # assign data to X & Y axes
 ax.set_xlabel(r"CH$_4$ [mmol/l]") # set labels
@@ -202,4 +335,4 @@ ax.invert_yaxis()
 fig.tight_layout()
 plt.show()
 #+END_SRC
-It is evident, that sedimentation/advection has a huge influence on concentration profiles. A specific problems for wetlands that exposed to episodic flooding, or tidal cycles.
+It is evident, that sedimentation/advection has a huge influence on concentration profiles. A specific problems for wetlands that are exposed to episodic flooding, or tidal cycles.
