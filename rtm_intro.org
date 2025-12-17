@@ -32,12 +32,19 @@ A notebook is a web‑based document that mixes *code*, *text*, *plots*, and *da
 - Use normal editor shortcuts (Ctrl‑A to select all, Ctrl‑Z to undo, etc.).  
 
 
+
 **  Running a Code Cell
 - | Run the current cell and move to the next  *Shift + Enter*  Executes the cell, shows output below, and selects the cell below (or creates a new one if you’re at the end).
 - Run the current cell and stay  *Ctrl + Enter*  Executes the cell but keeps the cursor in the same cell.
 - Run the current cell and insert a new one below  *Alt + Enter* Executes, then adds a fresh cell underneath. 
 
 /When you run a cell, the kernel prints the result (e.g., numbers, plots, tables) right under the cell. If there’s an error, the traceback appears there too./
+
+Try it right here:
+#+BEGIN_SRC jupyter-python
+23 + 3
+#+END_SRC
+
 
 **  Common Editing Shortcuts (while in *command mode*, =Esc=)
 

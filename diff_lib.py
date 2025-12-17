@@ -1,6 +1,7 @@
 """
+Utility library for the /fastfd/ package.
 
-Utility library for the /fastfd/ package that provides a small collection of
+THis libabry provides a small collection of
 functions and a lightweight container class used throughout the Pyrite Burial
 model.
 
@@ -24,7 +25,8 @@ The module contains:
   limiting the change to a specified fraction and enforcing non‑negative values.
 
 These helpers are primarily intended for modelling isotope diffusion and
-fractionation processes in geological simulations."""
+fractionation processes in geological simulations.
+"""
 
 import numpy as np
 
